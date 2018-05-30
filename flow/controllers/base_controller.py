@@ -185,7 +185,7 @@ class BaseController:
 # TODO: still a work in progress
 class SumoController:
 
-    def __init__(self, veh_id, controller_params):
+    def __init__(self, veh_id, controller_params = {}):
         """
         Base class for sumo-controlled acceleration behavior.
 

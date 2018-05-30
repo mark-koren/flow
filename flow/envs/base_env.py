@@ -9,14 +9,14 @@ from traci import constants as tc
 from rllab.core.serializable import Serializable
 from rllab.envs.base import Step
 import gym
-
+import pdb
 import sumolib
 
 from flow.controllers.car_following_models import *
 from flow.core.util import ensure_dir
 
-COLORS = [(255, 0, 0, 0), (0, 255, 0, 0), (0, 0, 255, 0), (255, 255, 0, 0),
-          (0, 255, 255, 0), (255, 0, 255, 0), (255, 255, 255, 0)]
+COLORS = [(255, 0, 0, 255), (0, 255, 0, 255), (0, 0, 255, 255), (255, 255, 0, 255),
+          (0, 255, 255, 255), (255, 0, 255, 255), (255, 255, 255, 255)]
 
 
 class SumoEnvironment(gym.Env, Serializable):
@@ -192,6 +192,8 @@ class SumoEnvironment(gym.Env, Serializable):
 
         # create the list of colors used to different between different types of
         # vehicles visually on sumo's gui
+        #TODO: Get these colors working!
+        # self.colors = {(255,0,0), (0,255,0),(0,0,255),(255,255,255)}
         self.colors = {}
         key_index = 1
         color_choice = np.random.choice(len(COLORS))
@@ -315,7 +317,7 @@ class SumoEnvironment(gym.Env, Serializable):
             contains other diagnostic information from the previous action
         """
         self.timer += 1
-
+        # pdb.set_trace()
         # perform acceleration and (optionally) lane change actions for
         # traci-controlled human-driven vehicles
         if len(self.controlled_ids) > 0:
@@ -371,9 +373,11 @@ class SumoEnvironment(gym.Env, Serializable):
         self.apply_rl_actions(rl_actions)
 
         self.additional_command()
-
+        # pdb.set_trace()
         self.traci_connection.simulationStep()
-
+        #Error being thrown from sumo/src/utils/foxtools/MFXImageHelper.cpp
+        # self.traci_connection.gui.screenshot("View #0", "/home/mkoren/Pictures/a"+str(self.timer)+".png")
+        # pdb.set_trace()
         # store new observations in the network after traci simulation step
         network_observations = \
             self.traci_connection.vehicle.getSubscriptionResults()
@@ -617,9 +621,9 @@ class SumoEnvironment(gym.Env, Serializable):
 
             # reset lane change mode
             self.set_lane_change_mode(veh_id)
-
+        # pdb.set_trace()
         self.traci_connection.simulationStep()
-
+        # pdb.set_trace()
         for veh_id in self.ids:
             # collect headway, leader id, and follower id data
             headway = self.traci_connection.vehicle.getLeader(veh_id, 200)
@@ -635,7 +639,7 @@ class SumoEnvironment(gym.Env, Serializable):
             self.state = self.get_state()
         else:
             self.state = self.get_state().T
-
+        
         observation = list(self.state)
         return observation
 

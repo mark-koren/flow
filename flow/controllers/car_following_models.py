@@ -391,3 +391,55 @@ class IDMController(BaseController):
 
     def reset_delay(self, env):
         pass
+
+class RandomController(BaseController):
+    def __init__(self, veh_id, v0=30, T=1, a=1, b=1.5, delta=4, s0=2, s1=0,
+                 decel_max=-5, dt=0.1, noise=0):
+        """
+        Instantiates an Intelligent Driver Model (IDM) controller
+
+        Attributes
+        ----------
+        veh_id: str
+            Vehicle ID for SUMO identification
+        v0: float, optional
+            desirable velocity, in m/s (default: 30)
+        T: float, optional
+            safe time headway, in s (default: 1)
+        a: float, optional
+            maximum acceleration, in m/s2 (default: 1)
+        b: float, optional
+            comfortable deceleration, in m/s2 (default: 1.5)
+        delta: float, optional
+            acceleration exponent (default: 4)
+        s0: float, optional
+            linear jam distance, in m (default: 2)
+        s1: float, optional
+            nonlinear jam distance, in m (default: 0)
+        decel_max: float, optional
+            max deceleration, in m/s2 (default: -5)
+        dt: float, optional
+            timestep, in s (default: 0.1)
+        noise: float, optional
+            std dev of normal perturbation to the acceleration (default: 0)
+        """
+        tau = T  # the time delay is taken to be the safe time headway
+        controller_params = {"delay": tau / dt, "max_deaccel": decel_max,
+                             "noise": noise}
+        BaseController.__init__(self, veh_id, controller_params)
+        self.v0 = v0
+        self.T = T
+        self.a = a
+        self.b = b
+        self.delta = delta
+        self.s0 = s0
+        self.s1 = s1
+        self.max_deaccel = decel_max
+        self.dt = dt
+
+    def get_accel(self, env):
+        return np.clip(np.random.normal(self.a/2, 2*np.abs(self.a)), self.max_deaccel, self.a)
+        #return np.random.uniform(self.max_deaccel, self.a)
+
+    def reset_delay(self, env):
+        pass
